@@ -1,28 +1,15 @@
 #include <zephyr/kernel.h>
-#include <zephyr/drivers/gpio.h>
-
-#define LED0_NODE DT_ALIAS(led0)
-
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
-
-#define SLEEP_TIME_MS 1000
+#include "led_button.h"
 
 int main(void)
 {
-	int ret;
-
-	if (!device_is_ready(led.port)) {
-		return -1;
-	}
-
-	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-	if (ret < 0) {
+	if (led_button_init() < 0) {
 		return -1;
 	}
 
 	while (1) {
-		gpio_pin_toggle(led.port, led.pin);
-		k_msleep(SLEEP_TIME_MS);
+		led_button_update();
+		k_msleep(10);
 	}
 	return 0;
 }
